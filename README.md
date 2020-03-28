@@ -2,7 +2,7 @@
 
 This is a [Unity Package](https://docs.unity3d.com/Manual/PackagesList.html) designed for Unity that allows you to perform binary delta compression given two similar native arrays of bytes.
 
-This package depends on slightly modified versions of the [K4os.Compression.LZ4](https://github.com/moosichu/K4os.Compression.LZ4) ([original](https://github.com/MiloszKrajewski/K4os.Compression.LZ4)) library. Instruction on how to setup this package with the correct dependencies can be found below.
+This package depends on [slightly modified versions](https://github.com/moosichu/K4os.Compression.LZ4/tree/moosichu/unity-support) of the [K4os.Compression.LZ4 library](https://github.com/MiloszKrajewski/K4os.Compression.LZ4) by Milosz Krajewski. Instructions on how to setup this package with the correct dependencies can be found below.
 
 This library as has a couple of helper functions for standard LZ4 compression as well.
 
