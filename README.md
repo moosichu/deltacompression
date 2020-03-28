@@ -11,7 +11,7 @@ This library as has a couple of helper functions for standard LZ4 compression as
 Add the following dependencies to your Unity project's `manifest.json` file:
 
 ```
-"com.moosichu.deltacompression": "https://github.com/moosichu/taggedunions.git",
+"com.moosichu.deltacompression": "https://github.com/moosichu/deltacompression.git",
 "k4os.compression.lz4": "https://github.com/moosichu/K4os.Compression.LZ4.git#moosichu/unity-support",
 "k4os.hash.xxhash": "https://github.com/moosichu/K4os.Hash.xxHash.git#moosichu/unity-support",
 ```
