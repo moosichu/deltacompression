@@ -89,7 +89,7 @@ static void CompressTest()
             bytes2[i] = unchecked((byte)random.NextInt());
         }
 
-        jobHandle = DeltaCompression.DeltaDeCompress(bytes1, compressedBytes, bytes2, jobHandle);
+        jobHandle = DeltaCompression.DeltaDecompress(bytes1, compressedBytes, bytes2, jobHandle);
         jobHandle.Complete();
 
         // Assert decompression works.
