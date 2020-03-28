@@ -12,6 +12,7 @@
     "dependencies": {
         "k4os.compression.lz4": "1.1.11",
         "k4os.hash.xxhash": "1.0.6",
-        "com.unity.burst": "1.2.3"
+        "com.unity.burst": "1.2.3",
+        "com.unity.mathematics": "1.1.0"
     }
   }

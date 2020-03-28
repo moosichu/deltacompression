@@ -5,6 +5,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Burst;
+using Unity.Mathematics;
 using K4os.Compression.LZ4;
 using System;
 
@@ -70,9 +71,12 @@ namespace TMRC.DeltaCompression
             [ReadOnly] public NativeSlice<byte> Data0;
             public NativeSlice<byte> InPlaceData1;
 
-            public void Execute(int index)
+            public unsafe void Execute(int index)
             {
-                InPlaceData1[index] = (byte)(InPlaceData1[index] ^ Data0[index]);
+                uint4* ptr0 = ((uint4*)NativeSliceUnsafeUtility.GetUnsafeReadOnlyPtr(Data0)) + index;
+                uint4* ptr1 = ((uint4*)NativeSliceUnsafeUtility.GetUnsafePtr(InPlaceData1)) + index;
+
+                *ptr1 = (*ptr1) ^ (*ptr0);
             }
         }
 
@@ -204,7 +208,7 @@ namespace TMRC.DeltaCompression
             {
                 Data0 = inData0,
                 InPlaceData1 = inOutData1,
-            }.Schedule(inData0.Length, 64, jobHandle);
+            }.Schedule((inData0.Length * UnsafeUtility.SizeOf<byte>()) / UnsafeUtility.SizeOf<uint4>(), 64, jobHandle);
 
             jobHandle = new EncodeJob()
             {
@@ -241,7 +245,7 @@ namespace TMRC.DeltaCompression
             {
                 Data0 = inData0,
                 InPlaceData1 = outData1,
-            }.Schedule(inData0.Length, 64, jobHandle);
+            }.Schedule((inData0.Length * UnsafeUtility.SizeOf<byte>()) / UnsafeUtility.SizeOf<uint4>(), 64, jobHandle);
             return jobHandle;
         }
     }
