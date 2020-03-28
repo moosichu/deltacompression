@@ -127,6 +127,47 @@ namespace TMRC.DeltaCompression
         }
 
         /// <summary>
+        /// Compress an array using LZ4 Compression in a Job.
+        /// </summary>
+        public static JobHandle StandardCompress(
+            NativeSlice<byte> inData,
+            CompressedBytesStorage outCompressedData,
+            JobHandle jobHandle = default,
+            LZ4Level compressionLevel = LZ4Level.L00_FAST
+        )
+        {
+            jobHandle = new EncodeJob()
+            {
+                SourceData = inData,
+                DestinationData = outCompressedData.Data,
+                CompressionLevel = compressionLevel,
+            }.Schedule(jobHandle);
+            return jobHandle;
+        }
+
+        /// <summary>
+        /// Decompress an array using LZ4 Compression in a Job.
+        ///
+        /// IMPORTANT NOTE: There are no safety checks to ensure that the data
+        /// being fed in is valid and of the correct lengths! Please ensure that
+        /// yourself.
+        /// </summary>
+        public static JobHandle StandardDecompress
+        (
+            NativeSlice<byte> inCompressedData,
+            NativeSlice<byte> outData,
+            JobHandle jobHandle = default
+        )
+        {
+            jobHandle = new DecodeJob()
+            {
+                SourceData = inCompressedData,
+                DestinationData = outData
+            }.Schedule(jobHandle);
+            return jobHandle;
+        }
+
+        /// <summary>
         /// Given two arrays of data (inData0, inOutData1) with minimal
         /// differences, this function will schedule jobs to compress inOutData1
         /// based on the differences.
@@ -154,7 +195,7 @@ namespace TMRC.DeltaCompression
             NativeSlice<byte> inOutData1, // Will be modified in-place
             CompressedBytesStorage outCompressedDelta1,
             JobHandle jobHandle = default,
-            LZ4Level compressionLevel =  LZ4Level.L00_FAST
+            LZ4Level compressionLevel = LZ4Level.L00_FAST
         )
         {
             Debug.Assert(inData0.Length == inOutData1.Length);
@@ -178,8 +219,12 @@ namespace TMRC.DeltaCompression
         /// <summary>
         /// Given a source array, and the delta-compressed array of the output,
         /// reconstruct the array that slightly differs from the source array.
+        ///
+        /// IMPORTANT NOTE: There are no safety checks to ensure that the data
+        /// being fed in is valid and of the correct lengths! Please ensure that
+        /// yourself.
         /// </summary>
-        public static JobHandle DeltaDeCompress
+        public static JobHandle DeltaDecompress
         (
             NativeSlice<byte> inData0,
             NativeSlice<byte> inCompressedDelta1,
