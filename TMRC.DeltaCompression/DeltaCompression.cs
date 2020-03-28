@@ -236,6 +236,7 @@ namespace TMRC.DeltaCompression
             JobHandle jobHandle = default
         )
         {
+            Debug.Assert(inData0.Length == outData1.Length);
             jobHandle = new DecodeJob()
             {
                 SourceData = inCompressedDelta1,
