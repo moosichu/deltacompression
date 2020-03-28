@@ -1,0 +1,17 @@
+{
+    "name": "com.moosichu.deltacompression",
+    "version": "0.1.0",
+    "displayName": "Delta Compression",
+    "description": "A simple library for compressing the differences between two native arrays",
+    "unity": "2019.3",
+    "author": {
+        "name": "Tom Maenan Read Cutting",
+        "email": "readcuttingt@gmail.com",
+        "url": "https://moosichu.com/"
+    },
+    "dependencies": {
+        "k4os.compression.lz4": "1.1.11",
+        "k4os.hash.xxhash": "1.0.6",
+        "com.unity.burst": "1.2.3"
+    }
+  }
