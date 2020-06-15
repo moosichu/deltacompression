@@ -28,7 +28,7 @@ namespace TMRC.DeltaCompression
     public struct CompressedBytesStorage : IDisposable
     {
         public int Length => Data.Length;
-        internal NativeArray<byte> Data;
+        public NativeArray<byte> Data;
         public void Dispose()
         {
             Data.Dispose();
