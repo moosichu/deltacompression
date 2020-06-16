@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Collections;
@@ -204,12 +204,7 @@ namespace TMRC.DeltaCompression
         {
             Debug.Assert(inData0.Length == inOutData1.Length);
             // XOR the data so we can easily run-length encode the changed bits
-            jobHandle = new XorJob()
-            {
-                Data0 = inData0,
-                InPlaceData1 = inOutData1,
-            }.Schedule((inData0.Length * UnsafeUtility.SizeOf<byte>()) / UnsafeUtility.SizeOf<uint4>(), 64, jobHandle);
-
+            jobHandle = ScheduleXorJob(inData0, inOutData1, jobHandle);
             jobHandle = new EncodeJob()
             {
                 SourceData = inOutData1,
@@ -218,6 +213,24 @@ namespace TMRC.DeltaCompression
             }.Schedule(jobHandle);
 
             return jobHandle;
+        }
+
+        private static JobHandle ScheduleXorJob(NativeSlice<byte> data0, NativeSlice<byte> inPlaceData1, JobHandle jobHandle)
+        {
+            {
+                // The XoR job only handles uint4-aligned arrays. This resolves that issue.
+                int modResult = data0.Length % 4;
+                for (int i = 1; i <= modResult; i++)
+                {
+                    int index = data0.Length - i;
+                    inPlaceData1[index] = (byte) (inPlaceData1[index] ^ data0[index]);
+                }
+            }
+            return new XorJob()
+            {
+                Data0        = data0,
+                InPlaceData1 = inPlaceData1,
+            }.Schedule((data0.Length * UnsafeUtility.SizeOf<byte>()) / UnsafeUtility.SizeOf<uint4>(), 64, jobHandle);
         }
 
         /// <summary>
@@ -242,11 +255,7 @@ namespace TMRC.DeltaCompression
                 SourceData = inCompressedDelta1,
                 DestinationData = outData1
             }.Schedule(jobHandle);
-            jobHandle = new XorJob()
-            {
-                Data0 = inData0,
-                InPlaceData1 = outData1,
-            }.Schedule((inData0.Length * UnsafeUtility.SizeOf<byte>()) / UnsafeUtility.SizeOf<uint4>(), 64, jobHandle);
+            jobHandle = ScheduleXorJob(inData0, outData1, jobHandle);
             return jobHandle;
         }
     }
