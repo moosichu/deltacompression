@@ -120,6 +120,23 @@ namespace TMRC.DeltaCompression
             }
         }
 
+        private struct XorLastFewBytesJob : IJob
+        {
+            public NativeSlice<byte> Data0;
+            public NativeSlice<byte> InPlaceData1;
+
+            public void Execute()
+            {
+                // The XoR job only handles uint4-aligned arrays. This resolves that issue.
+                int modResult = Data0.Length % 4;
+                for (int i = 1; i <= modResult; i++)
+                {
+                    int index = Data0.Length - i;
+                    InPlaceData1[index] = (byte) (InPlaceData1[index] ^ Data0[index]);
+                }
+            }
+        }
+
         /// <summary>
         /// Get the size of the NativeArray that will back CompressedBytesStorage
         /// when you initialise it with the source data length that you wish to
@@ -220,10 +237,13 @@ namespace TMRC.DeltaCompression
             {
                 // The XoR job only handles uint4-aligned arrays. This resolves that issue.
                 int modResult = data0.Length % 4;
-                for (int i = 1; i <= modResult; i++)
+                if (modResult > 0)
                 {
-                    int index = data0.Length - i;
-                    inPlaceData1[index] = (byte) (inPlaceData1[index] ^ data0[index]);
+                    jobHandle = new XorLastFewBytesJob()
+                    {
+                        Data0        = data0,
+                        InPlaceData1 = inPlaceData1,
+                    }.Schedule(jobHandle);
                 }
             }
             return new XorJob()
